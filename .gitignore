@@ -1,0 +1,4 @@
+.stack-work/
+pack-safe.cabal
+*~
+*.dump-*
