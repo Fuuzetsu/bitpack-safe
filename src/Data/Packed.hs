@@ -4,7 +4,6 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GADTs #-}
-{-# LANGUAGE MagicHash #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NoStarIsType #-}
 {-# LANGUAGE PolyKinds #-}
@@ -29,7 +28,8 @@
 -- See function descriptions for documentation. You may want to start
 -- at 'pack'.
 module Data.Packed
-    ( Container
+    ( AllFields
+    , Container
     , Decoder(..)
     , DecoderType(..)
     , Packable(..)
@@ -50,9 +50,9 @@ import Data.Bits ((.&.), complement, unsafeShiftL, unsafeShiftR)
 import Data.Kind (Constraint, Type)
 import Data.Proxy (Proxy(Proxy))
 import GHC.TypeLits
-    ( TypeError, ErrorMessage(Text, ShowType, (:<>:)), KnownNat, Nat, natVal
-    , type (^), type (-), type (*), type (-), type (+), type CmpNat
-    )
+   ( TypeError, ErrorMessage(Text, ShowType, (:<>:)), KnownNat, Nat, natVal
+   , type (^), type (-), type (*), type (-), type (+), type CmpNat
+   )
 import GHC.Word (Word8, Word16, Word32, Word64)
 
 -- | The underlying container. Currently it's 'Word64' and it's not
@@ -577,6 +577,26 @@ withFields
     :: forall ns xs t. WithFields (Fields ns xs) (AskFor ns xs t) t
     => Packed xs -> AskFor ns xs t -> t
 withFields (Packed p) = withFields' @(Fields ns xs) (Packed p)
+
+-- | A clumsy way to extract indicies of all "relevant" fields, i.e.
+-- skipping padding &c.
+--
+-- @
+-- withFields @(AllFields Foo) …
+-- @
+--
+-- This can ensure we're not forgetting anything if we happen to
+-- change Foo, such as by replacing part of Pad with an actual field.
+type family AllFields (xs :: k) :: [Nat] where
+    AllFields (Packed xs) = FieldIxs (FilterPad (Fields (AllFieldsHelper 0 xs) xs))
+
+type family FieldIxs xs :: [Nat] where
+    FieldIxs '[] = '[]
+    FieldIxs (S n _ _ ': xs) = n ': FieldIxs xs
+
+type family AllFieldsHelper n xs :: [Nat] where
+    AllFieldsHelper _ '[] = '[]
+    AllFieldsHelper n (_ ': xs) = n : AllFieldsHelper (n + 1) xs
 
 -- | Extract the field list from 'Packed'. Helper only.
 type family Underlying x where

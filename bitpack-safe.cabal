@@ -1,0 +1,56 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.1.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 270f1e9d38f2be4574a22a6e36c48c6d8ac3c9a3fe682ebfa82dc2a747c1721e
+
+name:           bitpack-safe
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/Fuuzetsu/bitpack-safe#readme>
+category:       Data
+homepage:       https://github.com/Fuuzetsu/bitpack-safe#readme
+bug-reports:    https://github.com/Fuuzetsu/bitpack-safe/issues
+author:         Mateusz Kowalczyk
+maintainer:     fuuzetsu@fuuzetsu.co.uk
+copyright:      2019 Mateusz Kowalczyk
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/Fuuzetsu/bitpack-safe
+
+library
+  exposed-modules:
+      Data.Packed
+  other-modules:
+      Paths_bitpack_safe
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+  if impl(ghc >= 8.6)
+    default-extensions: NoStarIsType
+  default-language: Haskell2010
+
+test-suite bitpack-safe-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_bitpack_safe
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      QuickCheck
+    , base >=4.7 && <5
+    , bitpack-safe
+    , tasty
+    , tasty-quickcheck
+  default-language: Haskell2010

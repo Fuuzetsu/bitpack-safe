@@ -24,6 +24,9 @@ dependencies:
 
 library:
   source-dirs: src
+  when:
+    - condition: impl(ghc >= 8.6)
+      default-extensions: NoStarIsType
 
 tests:
   bitpack-safe-test:
@@ -35,3 +38,6 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - bitpack-safe
+    - QuickCheck
+    - tasty
+    - tasty-quickcheck
